@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_height"
+        android:background="@color/color_top">
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="工单列表"
+            style="@style/top_title"/>
+        <ImageButton
+            android:id="@+id/ibtn_back"
+            android:layout_width="@dimen/top_back_width"
+            android:layout_height="@dimen/top_back_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/top_back_marginleft"
+            android:scaleType="fitXY"
+            android:background="@null"
+            android:visibility="gone"
+            android:src="@mipmap/btn_back"/>
+        <ImageButton
+            android:id="@+id/ibtn_add"
+            android:layout_width="@dimen/top_back_width"
+            android:layout_height="@dimen/top_back_height"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/top_back_marginleft"
+            android:scaleType="fitXY"
+            android:background="@null"
+            android:src="@mipmap/ibtn_add"/>
+    </RelativeLayout>
+
+    <com.zch.dispatch.pullload.PullToRefreshLayout
+        android:id="@+id/refresh_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include layout="@layout/refresh_head" />
+        <com.zch.dispatch.pullload.PullableListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="@dimen/list_driver_height"
+            android:divider="@android:color/transparent"
+            />
+
+        <include layout="@layout/load_more"/>
+    </com.zch.dispatch.pullload.PullToRefreshLayout>
+
+</LinearLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_height">48dp</dimen>
+    <dimen name="top_back_marginleft">10dp</dimen>
+    <dimen name="top_back_width">24dp</dimen>
+    <dimen name="top_back_height">24dp</dimen>
+
+    <dimen name="list_driver_height">5dp</dimen>
+</resources>
