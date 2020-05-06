@@ -6,7 +6,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -99,6 +101,7 @@ public class Activity_WorksheetAdd extends BaseActivity implements BaseCallbackL
 
         citys.add("重庆市");
 
+        areas.add("请选择区域");
         areas.add("渝中区");
         areas.add("大渡口区");
         areas.add("江北区");
@@ -168,6 +171,10 @@ public class Activity_WorksheetAdd extends BaseActivity implements BaseCallbackL
             ToastUtils.showToast(context, "联系电话不能为空！");
             return  false;
         }
+        if (sp_area.getSelectedItemPosition() == 0){
+            ToastUtils.showToast(context, "请选择区域！");
+            return  false;
+        }
         if(null == et_addr.getText() || TextUtils.isEmpty(et_addr.getText().toString())){
             ToastUtils.showToast(context, "详细地址不能为空！");
             return  false;
@@ -212,7 +219,7 @@ public class Activity_WorksheetAdd extends BaseActivity implements BaseCallbackL
     public void onError(int code, String response) {
         try{
             JSONObject js = new JSONObject(response);
-            String mess = js.optString("msg","");
+            String mess = js.optString("message","");
 
             Message msg = new Message();
             msg.what = HANDLER_GETDATA_FAIL;
@@ -255,5 +262,18 @@ public class Activity_WorksheetAdd extends BaseActivity implements BaseCallbackL
                     break;
             }
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (Activity_WorksheetAdd.this.getCurrentFocus() != null) {
+                if (Activity_WorksheetAdd.this.getCurrentFocus().getWindowToken() != null) {
+                    imm.hideSoftInputFromWindow(Activity_WorksheetAdd.this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+            }
+        }
+        return super.onTouchEvent(event);
     }
 }

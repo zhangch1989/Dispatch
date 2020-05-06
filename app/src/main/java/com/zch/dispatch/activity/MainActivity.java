@@ -1,14 +1,21 @@
 package com.zch.dispatch.activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.zch.dispatch.R;
 import com.zch.dispatch.adapter.WorksheetInfoAdapter;
@@ -33,7 +40,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends BaseActivity implements BaseCallbackListener{
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class MainActivity extends BaseActivity implements BaseCallbackListener, EasyPermissions.PermissionCallbacks{
     private final static String TAG = "MainActivity";
     private long firstTime = 0; //记录两次返回按钮的时间
 
@@ -181,6 +191,18 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener{
         refreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
     }
 
+    @AfterPermissionGranted(11)
+    public static void callPhoneTask(Context context,String phonenum){
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.CALL_PHONE)) {
+            // Have permission, do the thing!
+            docallPhone(context, phonenum);
+        } else {
+            // Ask for one permission
+            EasyPermissions.requestPermissions(context, "此功能需要申请拨打电话权限。",
+                    11, Manifest.permission.CALL_PHONE);
+        }
+    }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -231,7 +253,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener{
     public void onError(int code, String response) {
         try{
             JSONObject js = new JSONObject(response);
-            String mess = js.optString("msg","");
+            String mess = js.optString("message","");
 
             Message msg = new Message();
             msg.what = HANDLER_GETDATA_FAIL;
@@ -243,6 +265,21 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener{
             MLog.d(TAG, "getdata error "+ e);
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     public class ReceiveHandler extends Handler {
@@ -281,5 +318,51 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener{
                     break;
             }
         }
+    }
+
+    /**
+     * 拨打电话（）
+     *@param context
+     * @param phoneNum 电话号码
+     */
+    public static void docallPhone(final Context context, final String phoneNum) {
+        new AlertDialog.Builder(context)
+                .setTitle("提示")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage("确认拨打电话："+ phoneNum+"？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        callPhone(context, phoneNum);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+
+    }
+
+
+    /**
+     * 拨打电话
+     * @param phoneNum 电话号码
+     */
+    @SuppressLint("MissingPermission")
+    public static void callPhone(Context context, String phoneNum) {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + phoneNum);
+        intent.setData(data);
+        context.startActivity(intent);
+
+//        //跳转到拨号界面，用户手动点击拨打
+//        Intent intent = new Intent(Intent.ACTION_DIAL);
+//        Uri data = Uri.parse("tel:" + phoneNum);
+//        intent.setData(data);
+//        context.startActivity(intent);
     }
 }

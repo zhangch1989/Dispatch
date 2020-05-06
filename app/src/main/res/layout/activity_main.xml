@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:dividerHeight="@dimen/list_driver_height"
-            android:divider="@android:color/transparent"
+            android:divider="@android:color/darker_gray"
             />
 
         <include layout="@layout/load_more"/>

@@ -1,6 +1,15 @@
 package com.zch.dispatch.adapter;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +17,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.zch.dispatch.R;
+import com.zch.dispatch.activity.MainActivity;
 import com.zch.dispatch.bean.WorksheetInfo;
 
 import java.util.List;
@@ -21,7 +31,7 @@ public class WorksheetInfoAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private List<WorksheetInfo> datalist;
 
-    public WorksheetInfoAdapter(Context context, List<WorksheetInfo> datalist){
+    public WorksheetInfoAdapter(Context context, List<WorksheetInfo> datalist) {
         this.context = context;
         this.datalist = datalist;
         inflater = LayoutInflater.from(context);
@@ -45,7 +55,7 @@ public class WorksheetInfoAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
-        if(null == view){
+        if (null == view) {
             view = inflater.inflate(R.layout.item_worksheetinfo, null);
             holder = new ViewHolder();
             holder.tv_name = (TextView) view.findViewById(R.id.tv_username);
@@ -56,21 +66,28 @@ public class WorksheetInfoAdapter extends BaseAdapter {
             holder.tv_status = (TextView) view.findViewById(R.id.tv_status);
 
             view.setTag(holder);
-        }else{
+        } else {
             holder = (ViewHolder) view.getTag();
         }
-        WorksheetInfo info = datalist.get(i);
+        final WorksheetInfo info = datalist.get(i);
         holder.tv_name.setText(info.getUname());
-        holder.tv_tel.setText(info.getTelphone());
+        holder.tv_tel.setText(Html.fromHtml("<u>" + info.getTelphone() + "</u>"));
         holder.tv_content.setText(info.getContent());
-        holder.tv_addr.setText(info.getAddr());
+        holder.tv_addr.setText("地址："+info.getAddr());
         holder.tv_time.setText(info.getAddtime());
         holder.tv_status.setText(WorksheetInfo.getState(info.getStatus()));
+
+        holder.tv_tel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.callPhoneTask(context, info.getTelphone());
+            }
+        });
 
         return view;
     }
 
-    private class ViewHolder{
+    private class ViewHolder {
         TextView tv_name;
         TextView tv_tel;
         TextView tv_content;
@@ -79,7 +96,7 @@ public class WorksheetInfoAdapter extends BaseAdapter {
         TextView tv_status;
     }
 
-    public void Refresh(List<WorksheetInfo> list){
+    public void Refresh(List<WorksheetInfo> list) {
         this.datalist = list;
         notifyDataSetChanged();
     }

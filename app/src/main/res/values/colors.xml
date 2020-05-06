@@ -10,4 +10,6 @@
     <color name="green">#33CC33</color>
     <color name="color_top">@color/blue</color>
     <color name="color_driver">#F0F2F4</color>
+
+    <color name="driver_line">#646464</color>
 </resources>

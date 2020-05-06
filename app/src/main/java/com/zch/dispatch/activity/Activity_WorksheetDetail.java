@@ -1,5 +1,6 @@
 package com.zch.dispatch.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,8 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.zch.dispatch.R;
+import com.zch.dispatch.adapter.WorksheetInfoAdapter;
 import com.zch.dispatch.base.BaseActivity;
 import com.zch.dispatch.base.BaseCallbackListener;
 import com.zch.dispatch.base.Configs;
@@ -32,13 +36,18 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by zch on 2020/5/4.
  */
 
-public class Activity_WorksheetDetail extends BaseActivity implements BaseCallbackListener{
+public class Activity_WorksheetDetail extends BaseActivity implements BaseCallbackListener,EasyPermissions.PermissionCallbacks{
     private final static String TAG = "Activity_WorksheetDetail";
     private Context context;
 
@@ -95,7 +104,7 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
         tv_tel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callPhone(tv_tel.getText().toString());
+                callPhoneTask();
             }
         });
     }
@@ -110,7 +119,7 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
                 tv_addr.setText(info.getAddr());
                 tv_content.setText(info.getContent());
                 tv_addtime.setText(info.getAddtime());
-                tv_remark.setText(info.getRemark());
+                tv_remark.setText(dealNull(info.getRemark()));
                 tv_area.setText(info.getAreaname());
                 tv_owner.setText(info.getOwner());
                 tv_status.setText(WorksheetInfo.getState(info.getStatus()));
@@ -123,38 +132,25 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
         }
     }
 
+    private String dealNull(String data){
+        if (data == null || data.equals("null") || TextUtils.isEmpty(data)){
+            return "";
+        }
 
-    /**
-     * 拨打电话（跳转到拨号界面，用户手动点击拨打）
-     *
-     * @param phoneNum 电话号码
-     */
-    public void callPhone(final String phoneNum) {
-        new  AlertDialog.Builder(context)
-                .setTitle("提示" )
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setMessage("是否确认拨打电话？")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_DIAL);
-                        Uri data = Uri.parse("tel:" + phoneNum);
-                        intent.setData(data);
-                        startActivity(intent);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
-
+        return data;
     }
 
-
+    @AfterPermissionGranted(11)
+    public void callPhoneTask(){
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.CALL_PHONE)) {
+            // Have permission, do the thing!
+            MainActivity.docallPhone(context, tv_tel.getText().toString());
+        } else {
+            // Ask for one permission
+            EasyPermissions.requestPermissions(this, "此功能需要申请拨打电话权限。",
+                    11, Manifest.permission.CALL_PHONE);
+        }
+    }
 
     private void sendData() throws Exception{
         JSONObject js = new JSONObject();
@@ -194,7 +190,7 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
     public void onError(int code, String response) {
         try{
             JSONObject js = new JSONObject(response);
-            String mess = js.optString("msg","");
+            String mess = js.optString("message","");
 
             Message msg = new Message();
             msg.what = HANDLER_GETDATA_FAIL;
@@ -206,6 +202,22 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
             MLog.d(TAG, "getdata error "+ e);
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        callPhoneTask();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     public class ReceiveHandler extends Handler {
