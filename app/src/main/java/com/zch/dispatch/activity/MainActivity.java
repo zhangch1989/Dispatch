@@ -14,8 +14,8 @@ import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.zch.dispatch.R;
 import com.zch.dispatch.adapter.WorksheetInfoAdapter;
@@ -23,12 +23,12 @@ import com.zch.dispatch.base.BaseActivity;
 import com.zch.dispatch.base.BaseCallbackListener;
 import com.zch.dispatch.base.Configs;
 import com.zch.dispatch.bean.WorksheetInfo;
-import com.zch.dispatch.pullload.PullToRefreshLayout;
-import com.zch.dispatch.pullload.PullableListView;
 import com.zch.dispatch.tools.DialogUtils;
 import com.zch.dispatch.tools.MLog;
 import com.zch.dispatch.tools.PerfHelper;
 import com.zch.dispatch.tools.ToastUtils;
+import com.zch.mylibrary.pullload.PullToRefreshLayout;
+import com.zch.mylibrary.pullload.PullableListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,9 +36,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -51,6 +49,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     public static MainActivity instance;
 
     private ImageButton ibtn_add;
+    private Button btn_loginout;
     private PullableListView listview;
     private PullToRefreshLayout refreshLayout;
 
@@ -80,6 +79,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     }
 
     private void initView(){
+        btn_loginout = (Button) findViewById(R.id.btn_loginout);
         ibtn_add = (ImageButton) findViewById(R.id.ibtn_add);
         listview = (PullableListView) findViewById(R.id.listview);
         refreshLayout = (PullToRefreshLayout) findViewById(R.id.refresh_view);
@@ -89,6 +89,14 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     }
 
     private void initEvent(){
+        btn_loginout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //清空token
+                PerfHelper.setInfo("token", "");
+                loginOut();
+            }
+        });
         ibtn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -203,6 +211,27 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
         }
     }
 
+    private void loginOut(){
+        new AlertDialog.Builder(context)
+                .setTitle("提示")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage("确认退出系统？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        System.exit(0);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -254,13 +283,23 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
         try{
             JSONObject js = new JSONObject(response);
             String mess = js.optString("message","");
+            String flag = js.optString("code");
+            if (flag.equals(Configs.NO_ACCESS)){//token失效，跳转至登录界面
+                ToastUtils.showToast(context, "登录失效，请重新登录");
+                PerfHelper.setInfo("token", "");
+                Intent intent = new Intent(context, Activity_Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }else {
 
-            Message msg = new Message();
-            msg.what = HANDLER_GETDATA_FAIL;
-            Bundle bundle = new Bundle();
-            bundle.putString("mess", mess);
-            msg.setData(bundle);
-            receiveHandler.sendMessage(msg);
+                Message msg = new Message();
+                msg.what = HANDLER_GETDATA_FAIL;
+                Bundle bundle = new Bundle();
+                bundle.putString("mess", mess);
+                msg.setData(bundle);
+                receiveHandler.sendMessage(msg);
+            }
         }catch (JSONException e ){
             MLog.d(TAG, "getdata error "+ e);
             e.printStackTrace();
@@ -273,7 +312,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        
+
     }
 
     @Override

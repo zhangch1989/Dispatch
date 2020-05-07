@@ -14,6 +14,7 @@ public interface Configs {
      * 接口返回标志
      */
     String SUCCESS ="0";
+    String NO_ACCESS = "201"; //token失效
     String FAIL = "1";
 
 

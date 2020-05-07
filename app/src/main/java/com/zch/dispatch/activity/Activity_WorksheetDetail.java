@@ -1,12 +1,8 @@
 package com.zch.dispatch.activity;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,31 +12,26 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.zch.dispatch.R;
-import com.zch.dispatch.adapter.WorksheetInfoAdapter;
 import com.zch.dispatch.base.BaseActivity;
 import com.zch.dispatch.base.BaseCallbackListener;
 import com.zch.dispatch.base.Configs;
 import com.zch.dispatch.bean.WorksheetInfo;
-import com.zch.dispatch.pullload.PullToRefreshLayout;
 import com.zch.dispatch.tools.DialogUtils;
 import com.zch.dispatch.tools.MLog;
+import com.zch.dispatch.tools.PerfHelper;
 import com.zch.dispatch.tools.ToastUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -191,13 +182,23 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
         try{
             JSONObject js = new JSONObject(response);
             String mess = js.optString("message","");
+            String flag = js.optString("code");
+            if (flag.equals(Configs.NO_ACCESS)){//token失效，跳转至登录界面
+                ToastUtils.showToast(context, "登录失效，请重新登录");
+                PerfHelper.setInfo("token", "");
+                Intent intent = new Intent(context, Activity_Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }else {
 
-            Message msg = new Message();
-            msg.what = HANDLER_GETDATA_FAIL;
-            Bundle bundle = new Bundle();
-            bundle.putString("mess", mess);
-            msg.setData(bundle);
-            receiveHandler.sendMessage(msg);
+                Message msg = new Message();
+                msg.what = HANDLER_GETDATA_FAIL;
+                Bundle bundle = new Bundle();
+                bundle.putString("mess", mess);
+                msg.setData(bundle);
+                receiveHandler.sendMessage(msg);
+            }
         }catch (JSONException e ){
             MLog.d(TAG, "getdata error "+ e);
             e.printStackTrace();

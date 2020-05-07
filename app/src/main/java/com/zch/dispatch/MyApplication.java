@@ -7,6 +7,7 @@ import com.zch.dispatch.tools.DialogUtils;
 import com.zch.dispatch.tools.PerfHelper;
 import com.zhy.http.okhttp.OkHttpUtils;
 
+import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -27,6 +28,7 @@ public class MyApplication extends Application {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(10000L, TimeUnit.MILLISECONDS) //链接超时
                 .readTimeout(10000L,TimeUnit.MILLISECONDS) //读取超时
+                .proxy(Proxy.NO_PROXY)
                 .build();
         OkHttpUtils.initClient(okHttpClient);
     }

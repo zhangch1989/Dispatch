@@ -17,17 +17,14 @@
             android:layout_centerInParent="true"
             android:text="工单列表"
             style="@style/top_title"/>
-        <ImageButton
-            android:id="@+id/ibtn_back"
-            android:layout_width="@dimen/top_back_width"
-            android:layout_height="@dimen/top_back_height"
+        <Button
+            android:id="@+id/btn_loginout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/top_back_marginleft"
-            android:scaleType="fitXY"
             android:background="@null"
-            android:visibility="gone"
-            android:src="@mipmap/btn_back"/>
+            android:text="退出"/>
         <ImageButton
             android:id="@+id/ibtn_add"
             android:layout_width="@dimen/top_back_width"
@@ -40,12 +37,12 @@
             android:src="@mipmap/ibtn_add"/>
     </RelativeLayout>
 
-    <com.zch.dispatch.pullload.PullToRefreshLayout
+    <com.zch.mylibrary.pullload.PullToRefreshLayout
         android:id="@+id/refresh_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <include layout="@layout/refresh_head" />
-        <com.zch.dispatch.pullload.PullableListView
+        <com.zch.mylibrary.pullload.PullableListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -54,6 +51,6 @@
             />
 
         <include layout="@layout/load_more"/>
-    </com.zch.dispatch.pullload.PullToRefreshLayout>
+    </com.zch.mylibrary.pullload.PullToRefreshLayout>
 
 </LinearLayout>

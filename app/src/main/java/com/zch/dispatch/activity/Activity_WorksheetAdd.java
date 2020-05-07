@@ -1,6 +1,7 @@
 package com.zch.dispatch.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -220,13 +221,23 @@ public class Activity_WorksheetAdd extends BaseActivity implements BaseCallbackL
         try{
             JSONObject js = new JSONObject(response);
             String mess = js.optString("message","");
+            String flag = js.optString("code");
+            if (flag.equals(Configs.NO_ACCESS)){//token失效，跳转至登录界面
+                ToastUtils.showToast(context, "登录失效，请重新登录");
+                PerfHelper.setInfo("token", "");
+                Intent intent = new Intent(context, Activity_Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }else {
 
-            Message msg = new Message();
-            msg.what = HANDLER_GETDATA_FAIL;
-            Bundle bundle = new Bundle();
-            bundle.putString("mess", mess);
-            msg.setData(bundle);
-            receiveHandler.sendMessage(msg);
+                Message msg = new Message();
+                msg.what = HANDLER_GETDATA_FAIL;
+                Bundle bundle = new Bundle();
+                bundle.putString("mess", mess);
+                msg.setData(bundle);
+                receiveHandler.sendMessage(msg);
+            }
         }catch (JSONException e ){
             MLog.d(TAG, "getdata error "+ e);
             e.printStackTrace();

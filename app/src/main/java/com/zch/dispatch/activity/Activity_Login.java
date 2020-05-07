@@ -67,8 +67,14 @@ public class Activity_Login extends BaseActivity implements BaseCallbackListener
 
 //        et_username.setText(PerfHelper.getStringData("loginuser"));
 //        et_pwd.setText(PerfHelper.getStringData("loginpwd"));
-        et_username.setText("13222233454");
-        et_pwd.setText("3214");
+//        et_username.setText("13222233454");
+//        et_pwd.setText("3214");
+        if (!PerfHelper.getStringData("token").equals("")){
+            startActivity(new Intent(context, MainActivity.class));
+            finish();
+        }
+        et_username.setText(PerfHelper.getStringData("loginuser"));
+        et_pwd.setText(PerfHelper.getStringData("loginpwd"));
     }
 
     private void initEvent(){
