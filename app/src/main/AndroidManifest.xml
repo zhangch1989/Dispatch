@@ -35,6 +35,7 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan|stateHidden"
             />
+        <activity android:name=".activity.Activity_About"/>
     </application>
 
 </manifest>

@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     public static MainActivity instance;
 
     private ImageButton ibtn_add;
-    private Button btn_loginout;
+    private Button btn_about;
     private PullableListView listview;
     private PullToRefreshLayout refreshLayout;
 
@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     }
 
     private void initView(){
-        btn_loginout = (Button) findViewById(R.id.btn_loginout);
+        btn_about = (Button) findViewById(R.id.btn_about);
         ibtn_add = (ImageButton) findViewById(R.id.ibtn_add);
         listview = (PullableListView) findViewById(R.id.listview);
         refreshLayout = (PullToRefreshLayout) findViewById(R.id.refresh_view);
@@ -89,12 +89,10 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     }
 
     private void initEvent(){
-        btn_loginout.setOnClickListener(new View.OnClickListener() {
+        btn_about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //清空token
-                PerfHelper.setInfo("token", "");
-                loginOut();
+                startActivity(new Intent(context, Activity_About.class));
             }
         });
         ibtn_add.setOnClickListener(new View.OnClickListener() {
@@ -211,27 +209,6 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
         }
     }
 
-    private void loginOut(){
-        new AlertDialog.Builder(context)
-                .setTitle("提示")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage("确认退出系统？")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        System.exit(0);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
