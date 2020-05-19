@@ -23,4 +23,6 @@ public interface Configs {
     String Get_List =  IP_PATH  + "/clean/order/list";//获取工单列表
     String Add_Worksheet = IP_PATH + "/clean/order/add";  //新增工单
     String Send_Worksheet = IP_PATH + "/clean/order/finished"; //修改工单状态
+    String Update_Worksheet = IP_PATH + "/clean/order/appointModify"; //修改工单
+    String Order_Worksheet = IP_PATH + "/clean/order/appointModify"; //修改工单预约时间
 }

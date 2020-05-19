@@ -6,42 +6,37 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.text.TextPaint;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.zch.dispatch.R;
-import com.zch.dispatch.adapter.WorksheetInfoAdapter;
-import com.zch.dispatch.base.BaseActivity;
-import com.zch.dispatch.base.BaseCallbackListener;
-import com.zch.dispatch.base.Configs;
-import com.zch.dispatch.bean.WorksheetInfo;
-import com.zch.dispatch.tools.DialogUtils;
-import com.zch.dispatch.tools.MLog;
-import com.zch.dispatch.tools.PerfHelper;
+import com.zch.dispatch.fragment.Fragment_Finish;
+import com.zch.dispatch.fragment.Fragment_New;
+import com.zch.dispatch.fragment.Fragment_Todo;
 import com.zch.dispatch.tools.ToastUtils;
-import com.zch.mylibrary.pullload.PullToRefreshLayout;
-import com.zch.mylibrary.pullload.PullableListView;
+import com.zch.dispatch.views.NoPreloadViewPager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends BaseActivity implements BaseCallbackListener, EasyPermissions.PermissionCallbacks{
+public class MainActivity extends FragmentActivity implements EasyPermissions.PermissionCallbacks{
     private final static String TAG = "MainActivity";
     private long firstTime = 0; //记录两次返回按钮的时间
 
@@ -50,42 +45,43 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
 
     private ImageButton ibtn_add;
     private Button btn_about;
-    private PullableListView listview;
-    private PullToRefreshLayout refreshLayout;
 
-    private WorksheetInfoAdapter adapter;
-    private List<WorksheetInfo> datalist = new ArrayList<>();
+    private int currIndex = 0;
+    private NoPreloadViewPager mPager;
+    private ArrayList<Fragment> fragmentList;
+    private LinearLayout ll_tabs;
+    private Fragment fragment_tab1, fragment_tab2, fragment_tab3;
 
-    private int page = 1;
-    private int pagenum = 20;
-    private int returnpage = -1;
-    private boolean isloading = false;
-    public static ReceiveHandler receiveHandler;
-    private final static int HANDLE_REQ_DATA = 0;
-    private final static int HANDLER_GETDATA_SUCCESS = 1;
-    private final static int HANDLER_GETDATA_FAIL = 2;
-    public final static int HANDLER_REFRESH = 3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
         instance = this;
-        receiveHandler = new ReceiveHandler();
 
         initView();
         initEvent();
-        refreshLayout.autoRefresh();
     }
 
     private void initView(){
         btn_about = (Button) findViewById(R.id.btn_about);
         ibtn_add = (ImageButton) findViewById(R.id.ibtn_add);
-        listview = (PullableListView) findViewById(R.id.listview);
-        refreshLayout = (PullToRefreshLayout) findViewById(R.id.refresh_view);
+        ll_tabs = (LinearLayout) findViewById(R.id.ll_tabs);
+        mPager = (NoPreloadViewPager) findViewById(R.id.viewpager);
 
-        adapter = new WorksheetInfoAdapter(context, datalist);
-        listview.setAdapter(adapter);
+        fragmentList = new ArrayList<Fragment>();
+        fragment_tab1 = new Fragment_New();
+        fragment_tab2 = new Fragment_Todo();
+        fragment_tab3 = new Fragment_Finish();
+        fragmentList.add(fragment_tab1);
+        fragmentList.add(fragment_tab2);
+        fragmentList.add(fragment_tab3);
+
+        mPager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager(), fragmentList));
+        mPager.setCurrentItem(0);
+        mPager.setOnPageChangeListener(new MyOnPageChangeListener());
+//        mPager.setOffscreenPageLimit(2);
+        updataBtnColor();
     }
 
     private void initEvent(){
@@ -101,100 +97,37 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
                 startActivity(new Intent(context, Activity_WorksheetAdd.class));
             }
         });
-        refreshLayout.setOnRefreshListener(new PullToRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-                page = 1;
-                returnpage = -1;
-                receiveHandler.sendEmptyMessage(HANDLE_REQ_DATA);
-                isloading = true;
-            }
 
-            @Override
-            public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
-                if ( returnpage != -1 && !isloading) {
-                    ++page;
-                    isloading = true;
-                    receiveHandler.sendEmptyMessage(HANDLE_REQ_DATA);
-                }else {
-                    ToastUtils.showToast(context, "已是最底");
-                    refreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+        //tab 按钮的点击事件
+        for (int i = 0; i < ll_tabs.getChildCount(); i++){
+            RelativeLayout ll = (RelativeLayout) ll_tabs.getChildAt(i);
+            final  int index = i;
+            ll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    currIndex = index;
+                    mPager.setCurrentItem(index);
                 }
-            }
-        });
-
-
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                try {
-                    WorksheetInfo info = datalist.get(i);
-                    Intent intent = new Intent(context, Activity_WorksheetDetail.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("info", info);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void getData() throws Exception{
-        JSONObject js = new JSONObject();
-        js.put("workerId ", PerfHelper.getStringData("userid"));
-        baseGet(Configs.Get_List, PerfHelper.getStringData("userid"), 0, this);
-    }
-
-    private void dealdata(String str){
-        try{
-            JSONObject js = new JSONObject(str);
-            JSONArray ja = js.optJSONArray("data");
-            if(null != ja){
-                int length = ja.length();
-                if (page == 1) {
-                    datalist.clear();
-                }
-                if (length < pagenum){
-                    returnpage = -1;
-                }else {
-                    returnpage = page;
-                }
-                for (int i = 0; i < length; i++){
-                    JSONObject temp = ja.getJSONObject(i);
-                    WorksheetInfo info = new WorksheetInfo();
-                    info.setId(temp.optString("id"));
-                    info.setUname(temp.optString("customerName"));
-                    info.setTelphone(temp.optString("customerMobile"));
-                    info.setAddr(temp.optString("address"));
-                    info.setContent(temp.optString("needs"));
-                    info.setAreaname(temp.optString("area"));
-                    info.setDeal_user(temp.optString("worker"));
-                    info.setDeal_tel(temp.optString("workerMobile"));
-                    info.setOwner(temp.optString("director"));
-                    info.setAddtime(temp.optString("createTime"));
-                    info.setDealtime(temp.optString(""));
-                    info.setStatus(temp.optString("state"));
-                    info.setRemark(temp.optString("remarks"));
-                    datalist.add(info);
-                }
-            }else{
-                if (page == 1){
-                    datalist.clear();
-                }else{
-                    returnpage = -1;
-                }
-            }
-        }catch (Exception e){
-            MLog.e(TAG, "deal data error "+e);
-            e.printStackTrace();
+            });
         }
+    }
 
-        adapter.Refresh(datalist);
-        isloading = false;
-        refreshLayout.refreshFinish(PullToRefreshLayout.SUCCEED);
-        refreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+    /**
+     * 修改选中的tab颜色
+     */
+    private void updataBtnColor(){
+        for (int i = 0; i < ll_tabs.getChildCount(); i++){
+            TextView tv = (TextView)((RelativeLayout) ll_tabs.getChildAt(i)).getChildAt(0);
+            TextPaint tp = tv.getPaint();
+            LinearLayout ll = (LinearLayout) ((RelativeLayout) ll_tabs.getChildAt(i)).getChildAt(1);
+            if(i == currIndex){
+                tv.setTextColor(getResources().getColor(R.color.blue));
+                ll.setVisibility(View.VISIBLE);
+            }else{
+                tv.setTextColor(Color.BLACK);
+                ll.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     @AfterPermissionGranted(11)
@@ -227,61 +160,6 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
     }
 
 
-    @Override
-    public void onComplete(int code, String response) {
-        switch (code){
-            case 0:
-                Message msg = new Message();
-                msg.what = HANDLER_GETDATA_SUCCESS;
-                Bundle bundle = new Bundle();
-                bundle.putString("str", response);
-                msg.setData(bundle);
-                receiveHandler.sendMessage(msg);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onIOException(int code, IOException e) {
-        MLog.d(TAG, "get data IOException"+e);
-
-        Message msg = new Message();
-        msg.what = HANDLER_GETDATA_FAIL;
-        Bundle bundle = new Bundle();
-        bundle.putString("mess", "数据请求失败！");
-        msg.setData(bundle);
-        receiveHandler.sendMessage(msg);
-    }
-
-    @Override
-    public void onError(int code, String response) {
-        try{
-            JSONObject js = new JSONObject(response);
-            String mess = js.optString("message","");
-            String flag = js.optString("code");
-            if (flag.equals(Configs.NO_ACCESS)){//token失效，跳转至登录界面
-                ToastUtils.showToast(context, "登录失效，请重新登录");
-                PerfHelper.setInfo("token", "");
-                Intent intent = new Intent(context, Activity_Login.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            }else {
-
-                Message msg = new Message();
-                msg.what = HANDLER_GETDATA_FAIL;
-                Bundle bundle = new Bundle();
-                bundle.putString("mess", mess);
-                msg.setData(bundle);
-                receiveHandler.sendMessage(msg);
-            }
-        }catch (JSONException e ){
-            MLog.d(TAG, "getdata error "+ e);
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
@@ -298,43 +176,6 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    public class ReceiveHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case HANDLE_REQ_DATA:
-                    try {
-                        getData();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case HANDLER_GETDATA_SUCCESS:
-                    DialogUtils.dismissProcessDialog();
-                    String str = msg.getData().getString("str");
-                    dealdata(str);
-
-                    break;
-                case HANDLER_GETDATA_FAIL:
-                    DialogUtils.dismissProcessDialog();
-                    String mess = msg.getData().getString("mess");
-                    ToastUtils.showToast(context, mess);
-                    isloading = false;
-                    refreshLayout.refreshFinish(PullToRefreshLayout.FAIL);
-                    refreshLayout.loadmoreFinish(PullToRefreshLayout.FAIL);
-                    break;
-                case HANDLER_REFRESH:
-                    try {
-                        refreshLayout.autoRefresh();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 
     /**
      * 拨打电话（）
@@ -380,5 +221,43 @@ public class MainActivity extends BaseActivity implements BaseCallbackListener, 
 //        Uri data = Uri.parse("tel:" + phoneNum);
 //        intent.setData(data);
 //        context.startActivity(intent);
+    }
+
+    public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+        private List<Fragment> mFragments;
+        public MyFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments){
+            super(fm);
+            // TODO Auto-generated constructor stub
+            mFragments=fragments;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
+        }
+    }
+
+    public class MyOnPageChangeListener implements NoPreloadViewPager.OnPageChangeListener {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            currIndex = position;
+            updataBtnColor();
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 }

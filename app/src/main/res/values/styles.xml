@@ -15,8 +15,8 @@
 
 
     <style name="detail_line">
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:layout_marginBottom">15dp</item>
     </style>
     <style name="detail_str">
         <!--<item name="android:textColor">@color/black</item>-->
@@ -25,5 +25,21 @@
     <style name="detail_value">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+
+    <!-- 时间选择器 -->
+    <style name="dialog_normal" parent="@android:style/Theme.Dialog">
+        <!-- 设置dialog区域（包含标题部分）前景，会遮盖windowContentOverlay  windowBackground   BackgroundDimEnabled   -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 表示浮在屏幕上： true  在屏幕中心，相当于浮在页面上；  false 相当于整个盖在activity上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 是否全屏，配合android:windowIsFloating = false使用  全屏时会遮盖状态栏 -->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <!-- 设置dialog是否没有标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>

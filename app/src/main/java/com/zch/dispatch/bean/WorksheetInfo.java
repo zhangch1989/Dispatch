@@ -17,6 +17,8 @@ public class WorksheetInfo implements Serializable {
     private String content; //清洗需求
     private String areaname;//区域
     private String owner; //责任人
+    private String reservetime; //预约时间
+    private String cost ;  //清洗费用
     private String deal_user; //师傅
     private String deal_tel;//师傅电话
     private String addtime;  //工单生成时间
@@ -94,6 +96,22 @@ public class WorksheetInfo implements Serializable {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getReservetime() {
+        return reservetime;
+    }
+
+    public void setReservetime(String reservetime) {
+        this.reservetime = reservetime;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
     }
 
     public String getDeal_user() {

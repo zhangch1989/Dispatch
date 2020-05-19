@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zch.mylibrary.pullload.PullToRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/refresh_head" />
+    <com.zch.mylibrary.pullload.PullableListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="@dimen/list_driver_height"
+        android:divider="@android:color/darker_gray"
+        />
+
+    <include layout="@layout/load_more"/>
+</com.zch.mylibrary.pullload.PullToRefreshLayout>

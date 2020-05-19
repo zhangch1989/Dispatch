@@ -12,8 +12,8 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zch.dispatch.R;
@@ -21,8 +21,10 @@ import com.zch.dispatch.base.BaseActivity;
 import com.zch.dispatch.base.BaseCallbackListener;
 import com.zch.dispatch.base.Configs;
 import com.zch.dispatch.bean.WorksheetInfo;
-import com.zch.dispatch.fragment.Fragment_Finish;
+import com.zch.dispatch.datetime.TimeConfig;
+import com.zch.dispatch.fragment.Fragment_New;
 import com.zch.dispatch.fragment.Fragment_Todo;
+import com.zch.dispatch.tools.DateUtils;
 import com.zch.dispatch.tools.DialogUtils;
 import com.zch.dispatch.tools.MLog;
 import com.zch.dispatch.tools.PerfHelper;
@@ -39,17 +41,17 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by zch on 2020/5/4.
+ * 预约界面
  */
 
-public class Activity_WorksheetDetail extends BaseActivity implements BaseCallbackListener,EasyPermissions.PermissionCallbacks{
+public class Activity_WorksheetOrder extends BaseActivity implements BaseCallbackListener,EasyPermissions.PermissionCallbacks{
     private final static String TAG = "Activity_WorksheetDetail";
     private Context context;
 
     private ImageButton ibtn_back;
-    private TextView tv_name, tv_tel, tv_addr, tv_content, tv_remark, tv_addtime, tv_reserve, tv_cost, tv_status;
-    private Button btn_finish, btn_update;
-    private TextView tv_finishtime, tv_lastline;
-    private LinearLayout ll_finishtime;
+    private TextView tv_name, tv_tel, tv_addr, tv_content,  tv_addtime, tv_cost, tv_remark;
+    private EditText et_reserve;
+    private Button btn_finish;
 
     private WorksheetInfo info ;
 
@@ -60,7 +62,7 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_worksheetdetail);
+        setContentView(R.layout.activity_worksheetorder);
         context = this;
         receiveHandler = new ReceiveHandler();
         initView();
@@ -76,15 +78,9 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
         tv_content = (TextView) findViewById(R.id.tv_content);
         tv_remark = (TextView) findViewById(R.id.tv_remark);
         tv_addtime = (TextView) findViewById(R.id.tv_addtime);
-        tv_reserve = (TextView) findViewById(R.id.tv_reserve);
+        et_reserve = (EditText) findViewById(R.id.ed_reserve);
         tv_cost = (TextView) findViewById(R.id.tv_cost);
-        tv_status = (TextView) findViewById(R.id.tv_status);
         btn_finish = (Button) findViewById(R.id.btn_finish);
-        btn_update = (Button) findViewById(R.id.btn_update);
-
-        tv_finishtime = (TextView) findViewById(R.id.tv_finishtime);
-        tv_lastline = (TextView) findViewById(R.id.tv_lastline);
-        ll_finishtime = (LinearLayout) findViewById(R.id.ll_finishtime);
     }
 
     private void initEvent(){
@@ -109,15 +105,14 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
             }
         });
 
-        btn_update.setOnClickListener(new View.OnClickListener() {
+        et_reserve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, Activity_WorksheetUpdate.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("info", info);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                finish();
+                String time = et_reserve.getText().toString();
+                if(time.equals("")){
+                    time = DateUtils.getNowDatetime();
+                }
+                DateUtils.setDatetime(context, et_reserve, time, TimeConfig.YEAR_MONTH_DAY_HOUR_MINUTE);
             }
         });
     }
@@ -133,28 +128,8 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
                 tv_content.setText(info.getContent());
                 tv_addtime.setText(info.getAddtime());
                 tv_remark.setText(dealNull(info.getRemark()));
-                tv_reserve.setText( dealNull(info.getReservetime()));
+                et_reserve.setText(dealNull(info.getReservetime()));
                 tv_cost.setText(info.getCost() + "元");
-                tv_status.setText(WorksheetInfo.getState(info.getStatus()));
-                tv_finishtime.setText(dealNull(info.getDealtime()));
-                if (info.getStatus().equals("0")){
-                    tv_status.setTextColor(context.getResources().getColor(R.color.blue));
-                }else if (info.getStatus().equals("1")){
-                    tv_status.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
-                }else if (info.getStatus().equals("2")){
-                    tv_status.setTextColor(context.getResources().getColor(R.color.green));
-                }
-                if (info.getStatus().equals("2")){ //已完成和已结算
-                    btn_finish.setVisibility(View.GONE);
-                    btn_update.setVisibility(View.GONE);
-                    ll_finishtime.setVisibility(View.VISIBLE);
-                    tv_lastline.setVisibility(View.VISIBLE);
-                }else {
-                    ll_finishtime.setVisibility(View.GONE);
-                    tv_lastline.setVisibility(View.GONE);
-                    btn_finish.setVisibility(View.VISIBLE);
-                    btn_update.setVisibility(View.VISIBLE);
-                }
             }
         }
     }
@@ -181,8 +156,9 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
 
     private void sendData() throws Exception{
         JSONObject js = new JSONObject();
-        js.put("orderId", info.getId());
-        basePost(Configs.Send_Worksheet, js, 0, this);
+        js.put("id", info.getId());
+        js.put("appointDate", et_reserve.getText().toString().trim() + ":00");
+        basePost(Configs.Order_Worksheet, js, 0, this);
     }
 
     @Override
@@ -275,8 +251,8 @@ public class Activity_WorksheetDetail extends BaseActivity implements BaseCallba
                     if (Fragment_Todo.receiveHandler != null){
                         Fragment_Todo.receiveHandler.sendEmptyMessage(Fragment_Todo.HANDLER_REFRESH);
                     }
-                    if (Fragment_Finish.receiveHandler != null){
-                        Fragment_Finish.receiveHandler.sendEmptyMessage(Fragment_Finish.HANDLER_REFRESH);
+                    if (Fragment_New.receiveHandler != null){
+                        Fragment_New.receiveHandler.sendEmptyMessage(Fragment_New.HANDLER_REFRESH);
                     }
                     finish();
                     break;

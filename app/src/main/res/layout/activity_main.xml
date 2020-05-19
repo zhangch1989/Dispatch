@@ -2,21 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/rl_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_height"
         android:background="@color/color_top">
+
         <TextView
             android:id="@+id/tv_title"
+            style="@style/top_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="工单列表"
-            style="@style/top_title"/>
+            android:text="工单列表" />
+
         <Button
             android:id="@+id/btn_about"
             android:layout_width="wrap_content"
@@ -24,8 +25,9 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:background="@null"
-            android:textColor="@color/white"
-            android:text="关于"/>
+            android:text="关于"
+            android:textColor="@color/white" />
+
         <ImageButton
             android:id="@+id/ibtn_add"
             android:layout_width="@dimen/top_back_width"
@@ -33,25 +35,101 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/top_back_marginleft"
-            android:scaleType="fitXY"
             android:background="@null"
-            android:src="@mipmap/ibtn_add"/>
+            android:scaleType="fitXY"
+            android:src="@mipmap/ibtn_add" />
     </RelativeLayout>
 
-    <com.zch.mylibrary.pullload.PullToRefreshLayout
-        android:id="@+id/refresh_view"
+    <LinearLayout
+        android:id="@+id/ll_tabs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <include layout="@layout/refresh_head" />
-        <com.zch.mylibrary.pullload.PullableListView
-            android:id="@+id/listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:dividerHeight="@dimen/list_driver_height"
-            android:divider="@android:color/darker_gray"
-            />
+        android:layout_height="@dimen/top_height"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <include layout="@layout/load_more"/>
-    </com.zch.mylibrary.pullload.PullToRefreshLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="bottom"
+                android:text="新单"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="60dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@color/blue"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="bottom"
+                android:text="未完成"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="60dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@color/blue"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="bottom"
+                android:text="已完成"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="60dp"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@color/blue"
+                android:visibility="visible" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/line_color" />
+
+
+    <com.zch.dispatch.views.NoPreloadViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></com.zch.dispatch.views.NoPreloadViewPager>
 
 </LinearLayout>

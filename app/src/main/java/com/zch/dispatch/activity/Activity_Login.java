@@ -81,6 +81,7 @@ public class Activity_Login extends BaseActivity implements BaseCallbackListener
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DialogUtils.showProcessDialog(context, "登录验证中…");
                 if (isValidate()){
                     receiveHandler.sendEmptyMessage(HANDLE_REQ_DATA);
                 }

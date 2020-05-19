@@ -27,6 +27,14 @@
             android:scaleType="fitXY"
             android:background="@null"
             android:src="@mipmap/btn_back"/>
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:text="修改"/>
     </RelativeLayout>
 
     <ScrollView
@@ -113,6 +121,73 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
+                android:text="发起时间："/>
+            <TextView
+                android:id="@+id/tv_addtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2020-05-03 14:00"
+                style="@style/detail_value"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            style="@style/detail_line"
+            android:background="@color/color_driver"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/detail_str"
+                android:text="预约时间："/>
+            <TextView
+                android:id="@+id/tv_reserve"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/detail_value"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            style="@style/detail_line"
+            android:background="@color/color_driver"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/detail_str"
+                android:text="清洗费用："/>
+            <TextView
+                android:id="@+id/tv_cost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                style="@style/detail_value"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            style="@style/detail_line"
+            android:background="@color/color_driver"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/detail_str"
                 android:text="客户要求："/>
             <TextView
                 android:id="@+id/tv_content"
@@ -136,56 +211,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
-                android:text="区域："/>
+                android:text="备注："/>
             <TextView
-                android:id="@+id/tv_area"
+                android:id="@+id/tv_remark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="渝北区"
-                style="@style/detail_value"/>
-        </LinearLayout>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            style="@style/detail_line"
-            android:background="@color/color_driver"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/detail_str"
-                android:text="责任人："/>
-            <TextView
-                android:id="@+id/tv_owner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="责任人"
-                style="@style/detail_value"/>
-        </LinearLayout>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0.1dp"
-            style="@style/detail_line"
-            android:background="@color/color_driver"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/detail_str"
-                android:text="工单生成时间："/>
-            <TextView
-                android:id="@+id/tv_addtime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="2020-05-03 14:00"
+                android:text="我是备注"
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -217,6 +248,7 @@
             android:background="@color/color_driver"/>
 
         <LinearLayout
+            android:id="@+id/ll_finishtime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -224,19 +256,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
-                android:text="备注："/>
+                android:text="完成时间："/>
             <TextView
-                android:id="@+id/tv_remark"
+                android:id="@+id/tv_finishtime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="我是备注"
+                android:text=""
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
+            android:id="@+id/tv_lastline"
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
             style="@style/detail_line"
             android:background="@color/color_driver"/>
+
         <Button
             android:id="@+id/btn_finish"
             android:layout_width="match_parent"
@@ -245,6 +279,7 @@
             android:textColor="@color/white"
             android:background="@drawable/btn_bluebg"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:text="完成工单"/>
     </LinearLayout>
     </ScrollView>

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="新增工单"
+            android:text="预约信息录入"
             style="@style/top_title"/>
         <ImageButton
             android:id="@+id/ibtn_back"
@@ -47,12 +47,11 @@
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
                 android:text="客户姓名："/>
-            <EditText
-                android:id="@+id/ed_name"
+            <TextView
+                android:id="@+id/tv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:hint="请输入客户姓名（必填）"
+                android:text="张先生"
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -70,14 +69,12 @@
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
                 android:text="联系电话："/>
-            <EditText
-                android:id="@+id/ed_tel"
+            <TextView
+                android:id="@+id/tv_tel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="phone"
-                android:maxLength="11"
-                android:text=""
-                android:hint="请输入联系电话（必填）"
+                android:text="13549498789652"
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -95,26 +92,13 @@
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
                 android:text="地址："/>
-            <Spinner
-                android:id="@+id/sp_city"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/detail_value"
-                ></Spinner>
-            <Spinner
-                android:id="@+id/sp_area"
+            <TextView
+                android:id="@+id/tv_addr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/detail_value"
-                ></Spinner>
+                android:text="13549498789652"
+                style="@style/detail_value"/>
         </LinearLayout>
-        <EditText
-            android:id="@+id/ed_addr"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="街道、小区及楼栋门牌号"
-            style="@style/detail_value"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0.1dp"
@@ -129,7 +113,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
-                android:text="预约上门时间："/>
+                android:text="发起时间："/>
+            <TextView
+                android:id="@+id/tv_addtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2020-05-03 14:00"
+                style="@style/detail_value"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            style="@style/detail_line"
+            android:background="@color/color_driver"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/detail_str"
+                android:text="预约时间："/>
             <EditText
                 android:id="@+id/ed_reserve"
                 android:layout_width="match_parent"
@@ -156,12 +163,11 @@
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
                 android:text="清洗费用："/>
-            <EditText
-                android:id="@+id/ed_cost"
+            <TextView
+                android:id="@+id/tv_cost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:hint="单位（元）（必填）"
+                android:text=""
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -179,15 +185,12 @@
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
                 android:text="客户要求："/>
-            <EditText
-                android:id="@+id/ed_content"
+            <TextView
+                android:id="@+id/tv_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edit_bg"
-                android:lines="3"
+                android:textStyle="bold"
                 android:text=""
-                android:gravity="top"
-                android:hint="请输入客户需求（必填）"
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -204,15 +207,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/detail_str"
-                android:text="备&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;注："/>
-            <EditText
-                android:id="@+id/ed_remark"
+                android:text="备注："/>
+            <TextView
+                android:id="@+id/tv_remark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edit_bg"
-                android:lines="2"
-                android:text=""
-                android:gravity="top"
+                android:text="我是备注"
                 style="@style/detail_value"/>
         </LinearLayout>
         <TextView
@@ -220,8 +220,10 @@
             android:layout_height="0.1dp"
             style="@style/detail_line"
             android:background="@color/color_driver"/>
+
+
         <Button
-            android:id="@+id/btn_submit"
+            android:id="@+id/btn_finish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -229,7 +231,7 @@
             android:background="@drawable/btn_bluebg"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:text="提交工单"/>
+            android:text="预约"/>
     </LinearLayout>
     </ScrollView>
 
